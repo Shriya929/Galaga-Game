@@ -5,11 +5,16 @@ HEIGHT = 450
 
 bullets_List = []
 bugs = []
+remove_bullets = []
+remove_bugs = []
 
 g = Actor("galaga")
 g.x = 300
 g.y = 360
 
+direction = 1
+score = 0 
+game_over = False
 for t in range(3):
     for i in range(4):    
         u = Actor("bug")
@@ -24,9 +29,14 @@ def draw():
         b.draw()
     for i in bugs:
         i.draw()
+    screen.draw.text("Score =" + str(score), (0,400))
+    if game_over:
+        screen.fill("blue")
+        screen.draw.text("Game Over! Your score is" + str(score), (300,225))
     
 
 def update():
+    global direction,score,game_over
     if keyboard.left:
         if g.x > 0:
             g.x = g.x - 10
@@ -37,11 +47,34 @@ def update():
         b.y = b.y - 3
         if b.y < 0:
             bullets_List.remove(b)
-    for u in bugs:
-        u.x = u.x + 5
-    if bugs[-1].x >= 600:
         for u in bugs:
-            u.y = u.y + 20
+            if b.colliderect(u):
+                #bugs.remove(u)  
+                #bullets_List.remove(b)
+                remove_bugs.append(u)
+                remove_bullets.append(b)
+                score = score + 5
+    for u in remove_bugs:
+        if u in bugs:
+            bugs.remove(u)
+
+    for b in remove_bullets:
+        if b in bullets_List:
+            bullets_List.remove(b)
+    if bugs:
+        for u in bugs:
+            u.x = u.x + 5*direction
+        if bugs[-1].x >= 600:
+            direction = -1
+            for u in bugs:
+                u.y = u.y + 20
+        if bugs[0].x <= 0:
+            direction = 1
+            for u in bugs:
+                u.y = u.y + 20
+    else:
+        game_over = True
+
 def on_key_down(key):
     if key == keys.SPACE:
         b = Actor("bullet")
