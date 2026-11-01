@@ -15,6 +15,8 @@ g.y = 360
 direction = 1
 score = 0 
 game_over = False
+lose = False
+Time_up = False
 for t in range(3):
     for i in range(4):    
         u = Actor("bug")
@@ -33,10 +35,19 @@ def draw():
     if game_over:
         screen.fill("blue")
         screen.draw.text("Game Over! Your score is" + str(score), (300,225))
-    
+    if lose:
+        screen.fill("red")
+        screen.draw.text("You lose!",(300,225))
+    if Time_up:
+        screen.fill("green")
+        screen.draw.text("Times up! Your final score is" + str(score), (300,225))
+
+def timer():
+    global Time_up
+    Time_up = True
 
 def update():
-    global direction,score,game_over
+    global direction,score,game_over,lose
     if keyboard.left:
         if g.x > 0:
             g.x = g.x - 10
@@ -57,6 +68,10 @@ def update():
     for u in remove_bugs:
         if u in bugs:
             bugs.remove(u)
+    for b in bugs:
+        if g.colliderect(b):
+            lose = True
+            
 
     for b in remove_bullets:
         if b in bullets_List:
@@ -81,5 +96,5 @@ def on_key_down(key):
         b.x = g.x
         b.y = g.y - 45
         bullets_List.append(b)
-
+clock.schedule(timer,5)
 pgzrun.go()
